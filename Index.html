@@ -1,0 +1,341 @@
+```html
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cosmic Orbit: Gravity Defier</title>
+    <!-- Tailwind CSS für erstklassiges UI-Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome für schicke Sci-Fi Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030712;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+        canvas {
+            display: block;
+            touch-action: none;
+        }
+
+        /* Neon-Glow Effekte */
+        .neon-glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(6, 182, 212, 0.3);
+        }
+        .neon-glow-pink {
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.5), inset 0 0 10px rgba(236, 72, 153, 0.3);
+        }
+        .neon-glow-amber {
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+        }
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
+        }
+
+        /* Animierte Keyframes */
+        @keyframes rotate-slow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-rotate {
+            animation: rotate-slow 15s linear infinite;
+        }
+
+        @keyframes pulse-fast {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.05); filter: brightness(1.2); }
+        }
+        .animate-pulse-fast {
+            animation: pulse-fast 1s ease-in-out infinite;
+        }
+
+        @keyframes bg-glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        .bg-glow-effect {
+            animation: bg-glow 4s ease-in-out infinite;
+        }
+
+        /* 3D-Effekte für Buttons */
+        .btn-3d {
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-3d::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .btn-3d:hover::after {
+            left: 100%;
+        }
+        .btn-3d:active {
+            transform: scale(0.95) translateY(2px);
+        }
+    </style>
+</head>
+<body class="relative w-full h-screen flex flex-col items-center justify-center text-white">
+
+    <!-- Animierte Hintergrund-Nebula-Schicht -->
+    <div class="absolute inset-0 z-0 bg-glow-effect pointer-events-none opacity-40">
+        <div class="absolute -top-1/4 -left-1/4 w-full h-full bg-gradient-to-br from-indigo-900/30 via-transparent to-transparent rounded-full filter blur-[120px]"></div>
+        <div class="absolute -bottom-1/4 -right-1/4 w-full h-full bg-gradient-to-tl from-cyan-900/30 via-transparent to-transparent rounded-full filter blur-[120px]"></div>
+    </div>
+
+    <!-- Hauptmenü Screen -->
+    <div id="start-screen" class="absolute inset-0 z-10 flex flex-col items-center justify-between p-6 bg-gradient-to-b from-[#030712] via-[#090d1f] to-[#030712] text-center">
+        <!-- Zierelemente im Background -->
+        <div class="absolute w-[400px] h-[400px] border border-cyan-500/10 rounded-full animate-rotate pointer-events-none top-1/4"></div>
+        <div class="absolute w-[300px] h-[300px] border border-dashed border-pink-500/10 rounded-full animate-rotate pointer-events-none top-1/4" style="animation-direction: reverse;"></div>
+
+        <div class="mt-12 flex flex-col items-center z-10">
+            <!-- Geheimer Button: Raketen-Icon für den Cheat-Code mit stylischer Partikelaura -->
+            <div class="relative mb-6">
+                <div class="absolute inset-0 rounded-full bg-cyan-500/20 blur-xl animate-pulse"></div>
+                <button id="secret-rocket-btn" class="w-24 h-24 bg-gradient-to-tr from-cyan-500 via-indigo-600 to-pink-500 rounded-full flex items-center justify-center shadow-lg neon-glow-cyan transform active:scale-90 transition-transform focus:outline-none z-10 relative">
+                    <i class="fa-solid fa-rocket text-4xl text-white transform -rotate-45"></i>
+                </button>
+            </div>
+            
+            <h1 class="text-5xl md:text-6xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-indigo-400 to-pink-500 mb-2 neon-text-cyan">
+                COSMIC ORBIT
+            </h1>
+            <p class="text-xs md:text-sm text-cyan-300 uppercase tracking-[0.3em] font-semibold">Gravity Defier</p>
+        </div>
+
+        <!-- Dashboard / Stats Card -->
+        <div class="w-full max-w-sm bg-slate-950/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 my-4 z-10 shadow-2xl shadow-cyan-950/20">
+            <div class="flex justify-around mb-6 text-sm">
+                <div class="text-center">
+                    <p class="text-cyan-400/60 text-xs font-bold tracking-wider">BESTE PUNKTZAHL</p>
+                    <p id="menu-highscore" class="text-3xl font-extrabold text-cyan-400 tracking-wider">0</p>
+                </div>
+                <div class="text-center border-l border-white/10 pl-6">
+                    <p class="text-pink-400/60 text-xs font-bold tracking-wider">WELTRAUM-KRISTALLE</p>
+                    <p id="menu-crystals" class="text-3xl font-extrabold text-amber-400 tracking-wider">
+                        <i class="fa-solid fa-gem mr-1 text-sm animate-bounce"></i><span id="global-crystal-count">0</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Hauptmenü-Knöpfe mit krassen Effekten -->
+            <div class="space-y-4">
+                <button id="play-btn" class="btn-3d w-full py-4 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-extrabold rounded-2xl shadow-lg neon-glow-cyan transform hover:-translate-y-0.5 active:translate-y-1 text-xl tracking-wider uppercase">
+                    SPIEL STARTEN
+                </button>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="shop-btn" class="btn-3d py-3.5 bg-slate-900 hover:bg-slate-850 text-white font-bold rounded-2xl border border-pink-500/30 shadow-md shadow-pink-950/20 hover:border-pink-500 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-store text-pink-400"></i> Upgrade-Shop
+                    </button>
+                    <button id="sound-btn" class="btn-3d py-3.5 bg-slate-900 hover:bg-slate-850 text-white font-bold rounded-2xl border border-cyan-500/30 shadow-md shadow-cyan-950/20 hover:border-cyan-500 transition-all flex items-center justify-center gap-2">
+                        <i id="sound-icon" class="fa-solid fa-volume-high text-cyan-400"></i> Ton: Ein
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer mit Steuerungshinweis und Noah Produktion Signatur -->
+        <div class="mb-6 z-10 flex flex-col items-center gap-2">
+            <p class="text-xs text-indigo-300/80 max-w-xs mx-auto">
+                <i class="fa-solid fa-fingerprint mr-1 text-pink-400 animate-pulse"></i> Tippe auf den Bildschirm oder nutze die <b>Pfeiltasten</b>/<b>Leertaste</b> am PC!
+            </p>
+            <p class="text-[10px] tracking-[0.25em] text-cyan-400/60 uppercase font-black neon-text-cyan mt-1">
+                by Noah Produktion
+            </p>
+        </div>
+    </div>
+
+    <!-- Shop Screen (Overlay) -->
+    <div id="shop-screen" class="absolute inset-0 z-20 hidden flex flex-col justify-between p-6 bg-[#030712]/95 backdrop-blur-xl text-center">
+        <!-- Header -->
+        <div class="w-full max-w-md flex justify-between items-center mt-6 mx-auto">
+            <button id="back-to-menu-btn" class="btn-3d w-11 h-11 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center hover:bg-slate-850">
+                <i class="fa-solid fa-arrow-left text-lg"></i>
+            </button>
+            <h2 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wider">UPGRADE SHOP</h2>
+            <div class="bg-amber-500/10 px-4 py-2 rounded-xl border border-amber-500/30 text-amber-400 font-black text-sm flex items-center gap-1.5 shadow-lg">
+                <i class="fa-solid fa-gem text-amber-400 animate-pulse"></i> <span id="shop-crystal-count">0</span>
+            </div>
+        </div>
+
+        <!-- Shop Content Grid -->
+        <div class="w-full max-w-md my-auto px-1 space-y-6 overflow-y-auto max-h-[72vh] py-4">
+            
+            <!-- 1. Schiffskatussell (Skins) -->
+            <div id="skin-container" class="flex flex-col items-center py-6 bg-slate-950/60 rounded-3xl border border-white/10 shadow-xl relative overflow-hidden">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] tracking-wider font-extrabold text-indigo-400">SCHIFFS-HANGAR</div>
+                
+                <!-- Aktuelle Vorschau -->
+                <div class="h-32 flex items-center justify-center relative w-full overflow-hidden mt-2">
+                    <div id="skin-preview-glow" class="absolute w-24 h-24 rounded-full bg-cyan-500/20 blur-xl"></div>
+                    <canvas id="skin-preview-canvas" width="100" height="100" class="z-10"></canvas>
+                </div>
+                
+                <h3 id="skin-name" class="text-2xl font-black text-white mt-1 tracking-wider">Klassischer Jäger</h3>
+                
+                <!-- Schiff-Stats (Schild-Zellen) -->
+                <div class="flex items-center gap-1 mt-2 bg-slate-900/80 px-3 py-1 rounded-full border border-white/5">
+                    <span class="text-xs font-bold text-gray-400 mr-1">Basis-Festigkeit:</span>
+                    <div id="skin-shield-indicator" class="flex gap-0.5 text-cyan-400">
+                        <!-- Wird dynamisch befüllt -->
+                    </div>
+                </div>
+
+                <p id="skin-desc" class="text-xs text-gray-400 px-6 mt-3 h-10 leading-relaxed">Das Standardmodell. Schnell und wendig.</p>
+                
+                <!-- Navigation -->
+                <div class="flex items-center justify-between w-4/5 mt-4">
+                    <button id="prev-skin-btn" class="btn-3d w-11 h-11 rounded-full bg-slate-900 hover:bg-slate-800 border border-white/5 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-chevron-left text-pink-400"></i>
+                    </button>
+                    <div id="skin-price-tag" class="flex items-center gap-1.5 text-xl font-black text-amber-400">
+                        <i class="fa-solid fa-gem text-amber-500"></i> <span>0</span>
+                    </div>
+                    <button id="next-skin-btn" class="btn-3d w-11 h-11 rounded-full bg-slate-900 hover:bg-slate-800 border border-white/5 flex items-center justify-center text-lg">
+                        <i class="fa-solid fa-chevron-right text-pink-400"></i>
+                    </button>
+                </div>
+
+                <!-- Kaufen/Ausrüsten Button -->
+                <button id="equip-buy-btn" class="btn-3d mt-5 px-12 py-3 rounded-2xl font-black shadow-lg uppercase tracking-wider text-sm transition-all">
+                    AUSRÜSTEN
+                </button>
+            </div>
+
+            <!-- 2. Permanent Schild-Upgrades -->
+            <div class="p-5 bg-gradient-to-br from-indigo-950/40 to-slate-950/80 rounded-3xl border border-cyan-500/20 shadow-xl flex flex-col md:flex-row justify-between items-center gap-4 text-left relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 text-cyan-500/5 text-7xl font-bold pointer-events-none"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="flex-1">
+                    <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[9px] tracking-wider font-extrabold text-cyan-400">PERMANENTES MODUL</span>
+                    <h3 class="text-lg font-black text-white mt-1">Deflektor-Schild-Verstärkung</h3>
+                    <p class="text-xs text-gray-400 mt-1 leading-relaxed">Erhöht die maximale Schild-Festigkeit aller Schiffe permanent um <b class="text-cyan-400">+1</b> pro Level.</p>
+                    <!-- Fortschrittsbalken -->
+                    <div class="flex items-center gap-2 mt-3">
+                        <span class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Lvl <span id="shield-lvl-text">0</span></span>
+                        <div class="flex-1 h-2 bg-slate-900 rounded-full overflow-hidden flex gap-0.5">
+                            <div id="shield-upgrade-bar-1" class="h-full flex-1 bg-slate-800"></div>
+                            <div id="shield-upgrade-bar-2" class="h-full flex-1 bg-slate-800"></div>
+                            <div id="shield-upgrade-bar-3" class="h-full flex-1 bg-slate-800"></div>
+                            <div id="shield-upgrade-bar-4" class="h-full flex-1 bg-slate-800"></div>
+                            <div id="shield-upgrade-bar-5" class="h-full flex-1 bg-slate-800"></div>
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-400">Max 5</span>
+                    </div>
+                </div>
+                
+                <button id="upgrade-shield-btn" class="btn-3d w-full md:w-auto px-5 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-black rounded-2xl flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-cyan-500/10 min-w-[120px]">
+                    <span class="text-[10px] uppercase tracking-widest text-white/80 font-bold">UPGRADE</span>
+                    <span id="upgrade-shield-cost" class="text-sm font-black flex items-center gap-1 text-white">
+                        <i class="fa-solid fa-gem text-xs"></i> 500
+                    </span>
+                </button>
+            </div>
+
+        </div>
+        <div class="mb-4"></div>
+    </div>
+
+    <!-- HUD (Heads-Up Display) während des Spielens -->
+    <div id="hud" class="absolute inset-x-0 top-0 z-10 p-6 flex justify-between items-start pointer-events-none hidden">
+        <div class="flex flex-col gap-2">
+            <div>
+                <div class="text-xs text-cyan-400/60 uppercase font-bold tracking-widest">PUNKTE</div>
+                <div id="score-display" class="text-4xl font-black text-cyan-400 neon-text-cyan">0</div>
+            </div>
+            
+            <!-- Visuelle Schildanzeige -->
+            <div class="flex flex-col gap-1 bg-black/40 backdrop-blur-sm p-2 rounded-xl border border-white/5">
+                <span class="text-[9px] font-bold text-cyan-400 uppercase tracking-widest">Schildstabilität</span>
+                <div id="hud-shields" class="flex gap-1">
+                    <!-- Schild-Herzen werden hier generiert -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col items-end">
+            <div class="flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-2xl border border-white/5 mb-1">
+                <i class="fa-solid fa-gem text-amber-400 animate-pulse text-sm"></i>
+                <span id="game-crystal-display" class="text-lg font-black text-amber-400">0</span>
+            </div>
+            <div id="multiplier-display" class="text-xs font-bold text-pink-400 bg-pink-950/40 px-3 py-1 rounded-full border border-pink-500/30 hidden">
+                2x Multiplikator
+            </div>
+        </div>
+    </div>
+
+    <!-- Warnungen für Bosskampf oder Gefahr -->
+    <div id="warning-banner" class="absolute top-1/4 inset-x-0 z-30 pointer-events-none flex flex-col items-center justify-center opacity-0 transition-all duration-300 transform scale-95">
+        <div class="bg-red-500/20 border-y border-red-500/50 w-full py-4 backdrop-blur-md text-center shadow-lg shadow-red-500/10">
+            <span id="warning-text" class="text-red-400 font-black tracking-[0.3em] uppercase text-xl">WARNUNG: BOSS-NÄHERUNG!</span>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="game-over-screen" class="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 bg-black/90 backdrop-blur-lg text-center hidden">
+        <div class="bg-red-500/10 border border-red-500/30 rounded-full w-20 h-20 flex items-center justify-center mb-6 animate-pulse">
+            <i class="fa-solid fa-skull-crossbones text-4xl text-red-500"></i>
+        </div>
+        
+        <h2 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-400 mb-2">MISSION FEHLGESCHLAGEN</h2>
+        <p class="text-gray-400 text-sm max-w-xs mx-auto mb-6">Dein Schild hat versagt und dein Schiff kollidierte im Asteroidengürtel.</p>
+
+        <div class="grid grid-cols-2 gap-8 w-full max-w-xs mb-6">
+            <div class="bg-slate-950/60 p-4 rounded-2xl border border-white/5 shadow-xl">
+                <p class="text-xs text-gray-400 uppercase font-semibold">PUNKTE</p>
+                <p id="final-score" class="text-3xl font-black text-cyan-400">0</p>
+            </div>
+            <div class="bg-slate-950/60 p-4 rounded-2xl border border-white/5 shadow-xl">
+                <p class="text-xs text-gray-400 uppercase font-semibold">GESAMMELT</p>
+                <p id="final-crystals" class="text-3xl font-black text-amber-400">
+                    <i class="fa-solid fa-gem mr-1 text-base"></i><span id="game-collected-crystals">0</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="w-full max-w-xs space-y-3 mb-6">
+            <button id="retry-btn" class="btn-3d w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold rounded-2xl shadow-lg neon-glow-cyan transform text-lg uppercase tracking-wider">
+                NOCHMAL VERSUCHEN
+            </button>
+            <button id="menu-btn" class="btn-3d w-full py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-2xl border border-white/5">
+                HAUPTMENÜ
+            </button>
+        </div>
+
+        <p class="text-[10px] tracking-[0.25em] text-cyan-400/40 uppercase font-black neon-text-cyan">
+            by Noah Produktion
+        </p>
+    </div>
+
+    <!-- Das eigentliche Canvas für das Rendering -->
+    <canvas id="gameCanvas" class="w-full h-full"></canvas>
+
+    <script>
+        // --- SEKTION 1: SPIEL-KONFIGURATION & STATS ---
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'cosmic-orbit-gravity-defier';
+        
+        // Globale Spiel-Variablen
+        let highscore = parseInt(localStorage.getItem(`${appId}_highscore`)) || 0;
+        let globalCrystals = parseInt(localStorage.getItem(`${appId}_crystals`)) || 0;
+        let soundEnabled = localStorage.getItem(`${appId}_sound`) !== 'false';
+        let shieldUpgradeLevel = parseInt(localStorage.getItem(`${appId}_shield_lvl`)) || 0; // Permanent shield upgrade lvl (0 to 5)
+        
+        // Permanent Upgrade Preise
+        const shieldUpgradeCosts = [500, 2500, 10000, 50000, 250000];
+
+        // Skin-Shop Konfiguration
+        const skins = [
+            { id: 'default', name: 'Klassischer Jäger', price: 0, color: '
